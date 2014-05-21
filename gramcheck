@@ -1,0 +1,60 @@
+#!/usr/bin/php
+<?php
+define( "NUM_LETTERS", 26 );
+define( "START_LETTER", "a" );
+define( "END_LETTER", "z" );
+
+// $file = input file
+
+// $lines = everything before the separator in $file
+
+// Get rid of empty lines
+
+// $key = first line
+
+// $li_key = letter_inv( $key )
+
+// $all_grams = true
+
+// $gramlines = array( $key )
+
+// foreach $lines as $line
+
+	// $li = letter_inv( $line )
+
+	// if compare_lis( $li, $li_key ){ // if letter inventories mismatch
+	
+		// $gramlines[] = $line
+
+	// } else {
+
+		// echo "$line is not an anagram"
+
+	// }
+
+// Report on grams
+
+// if $gramlines is the same length as $lines
+	
+	// print $gramlines
+
+	// echo "all lines are anagrams"
+
+
+letter_inv( "" );
+
+/**
+* Return an array with an entry for each letter a-z saying how many of each letter is in $line, case insensitive.
+* @param string $line
+* @return array
+*/
+function letter_inv( $line ){
+	// Get a  
+	$letter_inv = array();
+	$l = START_LETTER;
+	for( $l = START_LETTER; $l <= END_LETTER && strlen( $l ) == 1; $l++ ){
+		$letter_inv[ $l ] = 0;
+	}
+	var_dump( $letter_inv );
+}
+?>
