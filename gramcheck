@@ -3,6 +3,9 @@
 define( "START_LETTER", "a" );
 define( "NUM_LETTERS", 26 );
 define( "SEP", "====" ); // Check non-empty lines above SEP(arator).
+define( "SL_COMMENTS", "//" );
+define( "ML_COMMENTS_BEG", "/*" );
+define( "ML_COMMENTS_END", "*/" );
 
 if( $argc < 2 ){ // No file argument.
 	usage();
@@ -25,8 +28,19 @@ else{
 }
 $lines = explode( "\n", $lines );
 
+// Get rid of text commented out with the single-line comment delimiter.
+$decommented_lines = array();
+foreach( $lines as $line ){
+	if( preg_match( "://:", $line ) ){
+		preg_match( ":(.*)//.*$:", $line, $matches );
+		$line = $matches[ 1 ]; // Text preceding SL_COMMENTS		
+	}
+	$decommented_lines[] = $line;
+}
+$lines = $decommented_lines;
+
 // Get rid of lines with no letters. Treat them as empty.
-$non_empty_lines = array ();
+$non_empty_lines = array();
 foreach( $lines as $line ){
 	if( preg_match( "/[a-zA-Z]/", $line ) ){
 		$non_empty_lines[] = $line;
