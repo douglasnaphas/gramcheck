@@ -2,52 +2,68 @@
 <?php
 define( "START_LETTER", "a" );
 define( "NUM_LETTERS", 26 );
+define( "SEP", "====" ); // Check non-empty lines above SEP(arator).
 
-if( $argc < 2 ){
-	echo "usage: gramcheck FILE\n";
-	exit( 1 );
+if( $argc < 2 ){ // No file argument.
+	usage();
 }
 
-// $file = input file
-// $file = file_get_contents(
+if( !file_exists( $argv[ 1 ] ) ){
+	echo "File $argv[1] does not exist.\n";
+	exit ( 1 );
+}
+
+$file_text = file_get_contents( $argv[ 1 ] );
 
 // $lines = everything before the separator in $file
+$sep_pos = strpos( $file_text, SEP );
+if( $sep_pos === false ){ // SEP not found. Check the whole file.
+	$lines = $file_text;
+}
+else{
+	$lines = substr( $file_text, 0, $sep_pos );
+}
+$lines = explode( "\n", $lines );
 
-// Get rid of empty lines
+// Get rid of lines with no letters. Treat them as empty.
+$non_empty_lines = array ();
+foreach( $lines as $line ){
+	if( preg_match( "/[a-zA-Z]/", $line ) ){
+		$non_empty_lines[] = $line;
+	}
+}
+$lines = $non_empty_lines;
 
 // $key = first line
+if( !is_array( $lines ) || count( $lines ) == 0 ){
+	echo "Nothing to check.\n";
+	exit( 1 );
+}
+$key = $lines[ 0 ]; // The string to check other lines against.
 
-// $li_key = letter_inv( $key )
+$li_key = letter_inv( $key );
 
-// $all_grams = true
+$all_grams = true;
 
-// $gramlines = array( $key )
+$gramlines = array();
 
-// foreach $lines as $line
-
-	// $li = letter_inv( $line )
-
-	// if compare_lis( $li, $li_key ){ // if letter inventories mismatch
-	
-		// $gramlines[] = $line
-
-	// } else {
-
-		// echo "$line is not an anagram"
-
-	// }
+foreach ( $lines as $line ){
+	if( letter_inv( $line ) == $li_key ){
+		$gramlines[] = $line;
+	}
+	else{
+		echo "\"$line\" is not an anagram of \"$key\".\n";
+	}
+}
 
 // Report on grams
-
 // if $gramlines is the same length as $lines
-	
-	// print $gramlines
-
-	// echo "all lines are anagrams"
-
-
-var_dump( letter_inv( "hello" ) == letter_inv( "hi" ) );
-var_dump( letter_inv( "hello" ) == letter_inv( "olelh" ) );
+if( count( $gramlines ) == count( $lines ) ){
+	foreach( $gramlines as $gramline ){
+		echo $gramline . "\n";
+	}
+	echo "\nAll lines are anagrams.\n";
+}
 
 /**
 * Return an array with an entry for each letter a-z saying how many of each letter is in $line, case insensitive.
@@ -56,5 +72,13 @@ var_dump( letter_inv( "hello" ) == letter_inv( "olelh" ) );
 */
 function letter_inv( $line ){
 	return array_slice( count_chars( strtolower( $line ) ), ord( START_LETTER ), NUM_LETTERS );
+}
+
+/**
+*  Display a usage message and exit abnormally.
+*/
+function usage(){
+	echo "usage: gramcheck FILE\n";
+	exit( 1 );
 }
 ?>
