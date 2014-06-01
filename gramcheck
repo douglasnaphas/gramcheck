@@ -4,15 +4,21 @@ define( "START_LETTER", "a" );
 define( "NUM_LETTERS", 26 );
 define( "SEP", "====" ); // Check non-empty lines above SEP(arator).
 define( "SL_COMMENTS", "//" );
-define( "ML_COMMENTS_BEG", "/*" );
-define( "ML_COMMENTS_END", "*/" );
+define( "ML_COMMENTS_BEG", "/*" ); // Not implemented.
+define( "ML_COMMENTS_END", "*/" ); // Not implemented.
 
 if( $argc < 2 ){ // No file argument.
 	usage();
 }
 
-if( !file_exists( $argv[ 1 ] ) ){
-	echo "File $argv[1] does not exist.\n";
+$opts = getopt( "h", array( "help" ) );
+if( array_key_exists( "h", $opts ) || array_key_exists( "help", $opts ) ){
+	help();
+}
+
+$file = $argv[ $argc - 1 ];
+if( !file_exists( $file ) ){
+	echo "File $file does not exist.\n";
 	exit ( 1 );
 }
 
@@ -57,8 +63,6 @@ $key = $lines[ 0 ]; // The string to check other lines against.
 
 $li_key = letter_inv( $key );
 
-$all_grams = true;
-
 $gramlines = array();
 
 foreach ( $lines as $line ){
@@ -92,7 +96,47 @@ function letter_inv( $line ){
 *  Display a usage message and exit abnormally.
 */
 function usage(){
-	echo "usage: gramcheck FILE\n";
+	echo "usage: gramcheck [OPTIONS] [FILE]\n";
 	exit( 1 );
+}
+
+/**
+*  Display a help message.
+*/
+function help(){
+	$sep = SEP;
+	$sl_comments = SL_COMMENTS;
+	echo <<<EOD
+gramcheck [OPTIONS] [FILE]: Say whether the lines above the separator "$sep" are anagrams of the first line of FILE.
+
+Report on all lines if "$sep" never appears. Ignore everything between "$sl_comments" and newline, empty lines, and lines with no letters.
+
+OPTIONS
+-h --help
+	Display this help and exit.
+
+EXAMPLES
+$ cat Tobey\ Ward
+Tobey Ward
+
+Toy bed war!
+Boy we dart // Change this one
+to bed wary.
+
+// Add more.
+
+====
+
+tobey ward
+
+draw
+bot
+draw ye bot
+obey
+toward bey
+$ gramcheck Tobey\ Ward # Check whether the first 4 lines are anagrams of each other.
+
+EOD;
+exit( 0 );
 }
 ?>
