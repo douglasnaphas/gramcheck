@@ -7,6 +7,65 @@ define( "SL_COMMENTS", "//" );
 define( "ML_COMMENTS_BEG", "/*" ); // Not implemented.
 define( "ML_COMMENTS_END", "*/" ); // Not implemented.
 
+/**
+* Return an array with an entry for each letter a-z saying how many of each letter is in $line, case insensitive.
+* @param string $line
+* @return array
+*/
+function letter_inv( $line ){
+	return array_slice( count_chars( strtolower( $line ) ), ord( START_LETTER ), NUM_LETTERS );
+}
+
+/**
+*  Display a usage message and exit abnormally.
+*/
+function usage(){
+	echo "usage: gramcheck [OPTIONS] [FILE]\n";
+	exit( 1 );
+}
+
+/**
+*  Display a help message.
+*/
+function help(){
+	$sep = SEP;
+	$sl_comments = SL_COMMENTS;
+	echo <<<EOD
+gramcheck [OPTIONS] [FILE]: Say whether the lines above the separator "$sep" are anagrams of the first line of FILE.
+
+Report on all lines if "$sep" never appears. Ignore everything between "$sl_comments" and newline, empty lines, and lines with no letters.
+
+OPTIONS
+-h --help
+	Display this help and exit.
+
+EXAMPLES
+$ cat Tobey\ Ward
+Tobey Ward
+
+Toy bed war!
+Boy we dart // Change this one
+to bed wary.
+
+// Add more.
+
+====
+
+tobey ward
+
+draw
+bot
+draw ye bot
+obey
+toward bey
+$ gramcheck Tobey\ Ward # Check whether the first 4 lines are anagrams of each other.
+
+EOD;
+exit( 0 );
+}
+
+/***************** gramcheck *********************************************/
+
 if( $argc < 2 ){ // No file argument.
 	usage();
 }
@@ -71,6 +130,7 @@ foreach ( $lines as $line ){
 	}
 	else{
 		echo "\"$line\" is not an anagram of \"$key\".\n";
+		exit( 1 );
 	}
 }
 
@@ -81,62 +141,9 @@ if( count( $gramlines ) == count( $lines ) ){
 		echo $gramline . "\n";
 	}
 	echo "\nAll lines are anagrams.\n";
+	exit( 0 );
 }
 
-/**
-* Return an array with an entry for each letter a-z saying how many of each letter is in $line, case insensitive.
-* @param string $line
-* @return array
-*/
-function letter_inv( $line ){
-	return array_slice( count_chars( strtolower( $line ) ), ord( START_LETTER ), NUM_LETTERS );
-}
+exit( 1 ); // We should've exited reporting a non-gram or reporting all grams.
 
-/**
-*  Display a usage message and exit abnormally.
-*/
-function usage(){
-	echo "usage: gramcheck [OPTIONS] [FILE]\n";
-	exit( 1 );
-}
-
-/**
-*  Display a help message.
-*/
-function help(){
-	$sep = SEP;
-	$sl_comments = SL_COMMENTS;
-	echo <<<EOD
-gramcheck [OPTIONS] [FILE]: Say whether the lines above the separator "$sep" are anagrams of the first line of FILE.
-
-Report on all lines if "$sep" never appears. Ignore everything between "$sl_comments" and newline, empty lines, and lines with no letters.
-
-OPTIONS
--h --help
-	Display this help and exit.
-
-EXAMPLES
-$ cat Tobey\ Ward
-Tobey Ward
-
-Toy bed war!
-Boy we dart // Change this one
-to bed wary.
-
-// Add more.
-
-====
-
-tobey ward
-
-draw
-bot
-draw ye bot
-obey
-toward bey
-$ gramcheck Tobey\ Ward # Check whether the first 4 lines are anagrams of each other.
-
-EOD;
-exit( 0 );
-}
 ?>
